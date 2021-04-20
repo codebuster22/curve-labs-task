@@ -1,0 +1,27 @@
+{
+  "name": "voting",
+  "version": "0.0.1",
+  "description": "Voting with a Twist, Curve Labs Task",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codebuster22/curve-labs-task.git"
+  },
+  "author": "Mihirsinh Parmar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codebuster22/curve-labs-task/issues"
+  },
+  "homepage": "https://github.com/codebuster22/curve-labs-task#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.1.3",
+    "hardhat": "^2.2.0"
+  }
+}
