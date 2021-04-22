@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 contract Stoppable is Context{
     

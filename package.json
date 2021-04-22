@@ -4,7 +4,11 @@
   "description": "Voting with a Twist, Curve Labs Task",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ganache-sample": "hardhat run --network ganache scripts/sample-script.js",
+    "ganache-deploy": "hardhat run --network ganache scripts/deploy-scripts.js",
+    "rinkeby-sample": "hardhat run --network rinkeby scripts/sample-script.js",
+    "rinkeby-deploy": "hardhat run --network rinkeby scripts/deploy-scripts.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +27,10 @@
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.1.3",
     "hardhat": "^2.2.0"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^4.0.0",
+    "dotenv": "^8.2.0"
   }
 }
