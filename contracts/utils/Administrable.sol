@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/utils/Context.sol";
 
 contract Administrable is Context {
     
-    mapping(address => uint8) private _is_admin;
     uint private _admin_count;
+    mapping(address => uint8) private _is_admin;
     
     event NewAdminAdded(address indexed new_admin, address indexed requester, uint timestamp);
     event AdminResigned(address indexed prev_admin, uint timestamp);
