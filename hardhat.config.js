@@ -23,10 +23,7 @@ module.exports = {
   defaultNetwork: 'ganache',
   networks: {
     ganache: {
-      url: "http://127.0.0.1:7545",
-      accounts: {
-        mnemonic: MNEMONIC
-      }
+      url: "http://127.0.0.1:7545"
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/07875f5ded264d0c9b5bcce6fb782494",
@@ -35,6 +32,14 @@ module.exports = {
       }
     }
   },
-  solidity: "0.8.3",
+  solidity: {
+    version: "0.8.3",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000
+      }
+    }
+  }
 };
 

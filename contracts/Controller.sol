@@ -116,7 +116,7 @@ contract Controller is Administrable{
     function ballotCancelBallot(uint _ballot_id) external onlyAdmin {
         
         address ballot_address;
-        (ballot_address, )= voting_storage.getBallot(_ballot_id);
+        ballot_address= voting_storage.getBallotAddress(_ballot_id);
         Ballot(ballot_address).destroyBallot();
         voting_storage.cancelBallot(_ballot_id);
         
@@ -125,7 +125,7 @@ contract Controller is Administrable{
     function ballotStart(uint _ballot_id) external onlyAdmin {
         
         address ballot_address;
-        (ballot_address, )= voting_storage.getBallot(_ballot_id);
+        ballot_address= voting_storage.getBallotAddress(_ballot_id);
         Ballot(ballot_address).start();
         
     }
@@ -133,7 +133,7 @@ contract Controller is Administrable{
     function ballotEnd(uint _ballot_id) external onlyAdmin {
         
         address ballot_address;
-        (ballot_address, )= voting_storage.getBallot(_ballot_id);
+        ballot_address= voting_storage.getBallotAddress(_ballot_id);
         Ballot(ballot_address).end();
         
     }
@@ -149,7 +149,7 @@ contract Controller is Administrable{
     }
     
     function ballotCastVote(address _ballot_address, uint _proposal_id) external {
-        Ballot(_ballot_address).castVote(_proposal_id);
+        Ballot(_ballot_address).castVote(msg.sender,_proposal_id);
     }
     
     

@@ -126,6 +126,10 @@ contract Storage{
         return voting_controller;
     }
     
+    function getBallotAddress(uint _ballot_id) external view returns(address ballot_address_){
+        return id_to_ballot[_ballot_id].contract_address ;
+    }
+    
     function getBallot(uint _ballot_id) external view returns(Ballot memory ballot_){
         ballot_ = id_to_ballot[_ballot_id];
     }

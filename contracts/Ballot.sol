@@ -60,18 +60,17 @@ contract Ballot is Stoppable {
         
         state = BallotState.VOTING_STARTED;
         _start();
-        voting_storage.changeBallotState(address(this), uint8(BallotState.VOTING_STARTED));
+        voting_storage.changeBallotState(uint8(BallotState.VOTING_STARTED));
         emit VotingStarted(msg.sender, block.timestamp);
     }
     
-    //Add require condition to check for status = VOTING_STARTED
     function end() public whenNotStopped {
         
         require(msg.sender == voting_controller, "Ballot: Sender is not the controller");
         
         _stop();
         state = BallotState.VOTING_ENDED;
-        voting_storage.changeBallotState(address(this), uint8(BallotState.VOTING_ENDED));
+        voting_storage.changeBallotState(uint8(BallotState.VOTING_ENDED));
         
         emit VotingEnded(msg.sender, block.timestamp);
         getWinner();
@@ -92,12 +91,13 @@ contract Ballot is Stoppable {
         }
         
     }
-    
-    function castVote(uint _id) public whenNotStopped {
+
+    function castVote(address _ballot_address ,uint _id) public whenNotStopped {
         
-        require(have_voted[msg.sender] == 0, "Ballot: You cannot vote multiple times");
-        have_voted[msg.sender] = 1;
-        uint wt = voting_storage.getVoteWeight(msg.sender);
+        require(msg.sender == voting_controller, "Ballot: Sender is not the controller");
+        require(have_voted[_ballot_address] == 0, "Ballot: You cannot vote multiple times");
+        have_voted[_ballot_address] = 1;
+        uint wt = voting_storage.getVoteWeight(_ballot_address);
         require( wt > 0, "Ballot: You don't have permission to vote");
         proposals[_id].votes+=wt;
         

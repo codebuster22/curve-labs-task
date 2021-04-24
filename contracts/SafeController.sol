@@ -46,22 +46,22 @@ contract SafeController {
     ModuleManager private manager;
     address       private controller;
     
-    mapping (uint    => OwnershipProposal) public ownershipProposals;
-    mapping (uint    => uint8)             public proposalStatus;
-    mapping (address => uint8)             public haveVoted;
-    mapping (bytes32 => bool)              public isExecuted;
-    
-    modifier initialisedAndControlled {
-        require( isInitialised == 1,       "SafeController: Contract not initialised");
-        require( msg.sender == controller, "SafeController: Can only interact using Controller");
-        _;
-    }
+    mapping (uint    => OwnershipProposal)         public ownershipProposals;
+    mapping (uint    => uint8)                     public proposalStatus;
+    mapping (uint    => mapping(address => uint8)) public haveVoted;
+    mapping (bytes32 => bool)                      public isExecuted;
     
     event SafeManagerChanged            (address prev_safe, address new_safe);
     event ControlTransferred            (address prev_controller, address new_controller);
     event NewOwnershipProposalCreated   (uint indexed proposal_id, uint8 action, address proposed_owner, uint new_threshold, uint timestamp);
     event OwnershipProposalEnded        (uint indexed proposal_id, uint8 action, bool success, uint timestamp);
     event NewVoteCasted                 (uint indexed proposal_id, uint yes_wt, uint no_wt);
+    
+    modifier initialisedAndControlled {
+        require( isInitialised == 1,       "SafeController: Contract not initialised");
+        require( msg.sender == controller, "SafeController: Can only interact using Controller");
+        _;
+    }
     
     function initialiseSafeController(address _safe, address _controller) external {
         
@@ -95,10 +95,10 @@ contract SafeController {
     
     function yes(uint _proposal_id, uint _yesWt, address _voter) external initialisedAndControlled {
         
-        require(proposalStatus[_proposal_id] == 1, "SafeController: Proposal Ended");
-        require(haveVoted[_voter] == 0,            "SafeController: Already casted a vote");
+        require(proposalStatus[_proposal_id] == 1,    "SafeController: Proposal Ended");
+        require(haveVoted[_proposal_id][_voter] == 0, "SafeController: Already casted a vote");
         
-        haveVoted[_voter] = 1;
+        haveVoted[_proposal_id][_voter] = 1;
         uint yesWt = ownershipProposals[_proposal_id].yesWt;
         uint totalWt = yesWt + _yesWt;
         ownershipProposals[_proposal_id].yesWt = totalWt;
@@ -113,10 +113,10 @@ contract SafeController {
     
     function no(uint _proposal_id, uint _noWt, address _voter) external initialisedAndControlled {
         
-        require(proposalStatus[_proposal_id] == 1, "SafeController: Proposal Ended");
-        require(haveVoted[_voter] == 0,            "SafeController: Already casted a vote");
+        require(proposalStatus[_proposal_id] == 1,    "SafeController: Proposal Ended");
+        require(haveVoted[_proposal_id][_voter] == 0, "SafeController: Already casted a vote");
         
-        haveVoted[_voter] = 1;
+        haveVoted[_proposal_id][_voter] = 1;
         uint noWt = ownershipProposals[_proposal_id].noWt;
         uint totalWt = noWt + _noWt;
         ownershipProposals[_proposal_id].noWt = totalWt;
