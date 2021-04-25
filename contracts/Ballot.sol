@@ -73,7 +73,7 @@ contract Ballot is Stoppable {
         voting_storage.changeBallotState(uint8(BallotState.VOTING_ENDED));
         
         emit VotingEnded(msg.sender, block.timestamp);
-        getWinner();
+        _getWinner();
     }
     
     function createProposals(string[] memory _proposal_names, string[] memory _proposal_documents) public whenStopped {
@@ -109,16 +109,10 @@ contract Ballot is Stoppable {
         _destroyBallot();
     }
     
-    function getWinner() public returns (Proposal memory proposal_) {
-        
-        require(uint8(state) >= uint8(BallotState.VOTING_ENDED) , "Ballot: Cannot declare winner without voting");
-        
-        state = BallotState.RESULTS_OUT;
-        winnerIndex = _winnerIndex();
-        
-        emit WinnerProposal(winnerIndex, block.timestamp);
+     function getWinner() public view returns (Proposal memory proposal_) {
+        require(uint8(state) >= uint8(BallotState.VOTING_ENDED) , "Ballot: Voting is still active");
         return proposals[winnerIndex];
-    }
+     }
     
     function getStorageAddress() external view returns(address storage_) {
         storage_ = address(voting_storage);
@@ -142,6 +136,17 @@ contract Ballot is Stoppable {
             }
         }
         
+    }
+    
+    function _getWinner() private {
+        
+        require(uint8(state) >= uint8(BallotState.VOTING_ENDED) , "Ballot: Cannot declare winner without voting");
+        
+        state = BallotState.RESULTS_OUT;
+        winnerIndex = _winnerIndex();
+        voting_storage.changeBallotState(uint8(BallotState.RESULTS_OUT));
+        
+        emit WinnerProposal(winnerIndex, block.timestamp);
     }
     
     function _destroyBallot() private {

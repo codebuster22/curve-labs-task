@@ -33,6 +33,7 @@ contract SafeController {
     
     struct OwnershipProposal{
         address proposedOwner;
+        uint proposalId;
         uint newThreshold;
         uint yesWt;
         uint noWt;
@@ -87,7 +88,7 @@ contract SafeController {
         
         uint id = proposalCounter;
         proposalCounter++;
-        ownershipProposals[id] = OwnershipProposal(_proposedOwner, _newThreshold, 0, 0, OwnershipProposalAction(_action));
+        ownershipProposals[id] = OwnershipProposal(_proposedOwner, id, _newThreshold, 0, 0, OwnershipProposalAction(_action));
         proposalStatus[id] = 1;
         
         emit NewOwnershipProposalCreated(id,_action, _proposedOwner, _newThreshold, block.timestamp);
@@ -148,13 +149,15 @@ contract SafeController {
         
         OwnershipProposal[] memory proposals = new OwnershipProposal[](proposalCounter);
         
+        uint j;
         for(uint i; i<proposalCounter; i++){
             if(proposalStatus[i]==1){
-                proposals[i] = ownershipProposals[i];
+                proposals[j] = ownershipProposals[i];
+                j++;
             }
         }
         
-        proposals_ = proposals;
+        return proposals;
     }
     
     function _setController(address new_controller) private {
@@ -189,7 +192,7 @@ contract SafeController {
     
     function _finalise(uint proposal_id) private returns(uint8) {
         
-        require(proposal_id == 0, "SafeController: Proposal still active");
+        require(proposalStatus[proposal_id] == 0, "SafeController: Proposal still active");
         
         uint8 action = uint8(ownershipProposals[proposal_id].action);
         address proposedOwner = ownershipProposals[proposal_id].proposedOwner;

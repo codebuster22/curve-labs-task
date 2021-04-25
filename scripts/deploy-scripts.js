@@ -1,44 +1,72 @@
+const fs = require('fs');
+const path = require('path');
 const hre = require("hardhat");
 require('dotenv').config({path: './.env'});
-const fs = require('fs');
+const DeployedContracts = require('../client/src/DeployedContracts.json');
+const clientPath = path.resolve(__dirname, '../client/src/');
 
-
-const {BALANCER_POOL_ADDRESS} = process.env;
-
-console.log(`The Balance Pool address is :- ${BALANCER_POOL_ADDRESS}\n`);
+const {BALANCER_POOL_ADDRESS, SAFE_MANAGER_ADDRESS} = process.env;
+console.log(`The Balance Pool address is :- ${BALANCER_POOL_ADDRESS}`);
+console.log(`The Safe Manager address is :- ${SAFE_MANAGER_ADDRESS}\n`);
 
 const main = async () => {
 
     console.log("--------------------------------------------------------------\n")
 
-    console.log("Deploying Storage contract");
-    const Storage = await hre.ethers.getContractFactory("Storage");
-    const storage = await Storage.deploy(BALANCER_POOL_ADDRESS);
-
-    const storageInstance =  await storage.deployed();
-
-    console.log(`Storage deployed to: ${storage.address}\n`);
-
-    console.log("--------------------------------------------------------------\n")
-
     console.log("Deploying Controller contract");
-    const Controller = await hre.ethers.getContractFactory("Controller");
-    const controller = await Controller.deploy(storage.address);
+    const ControllerFactory = await hre.ethers.getContractFactory("Controller");
+    const Controller = await ControllerFactory.deploy();
 
-    const controllerInstance =  await controller.deployed();
+    const controller =  await Controller.deployed();
 
     console.log(`Controller deployed to: ${controller.address}\n`);
 
     console.log("--------------------------------------------------------------\n")
 
-    console.log(`Updating Controller:-`);
+    console.log("Deploying SafeController contract");
+    const SafeControllerFactory = await hre.ethers.getContractFactory("SafeController");
+    const SafeController = await SafeControllerFactory.deploy();
 
-    await storageInstance.initialiseController(controller.address);
+    const safeController =  await SafeController.deployed();
 
-    const addCont = await storageInstance.getController();
-    const addStor = await controllerInstance.getStorage();
+    console.log(`SafeController deployed to: ${safeController.address}\n`);
 
-    if(addCont === controller.address && addStor === storage.address) console.log("Successfully Updated");
+    console.log("--------------------------------------------------------------\n")
+
+    console.log("Deploying Storage contract");
+    const StorageFactory = await hre.ethers.getContractFactory("Storage");
+    const Storage = await StorageFactory.deploy(BALANCER_POOL_ADDRESS, controller.address);
+
+    const storage =  await Storage.deployed();
+
+    console.log(`Storage deployed to: ${storage.address}\n`);
+
+    console.log("--------------------------------------------------------------\n")
+
+    console.log(`Initialising contracts:-`);
+
+    await controller.initialiseController(storage.address, safeController.address);
+    await safeController.initialiseSafeController(SAFE_MANAGER_ADDRESS, controller.address);
+
+    console.log(`Successfully Updated!\n`);
+
+    console.log(`Saving contract addresses`);
+
+    let {chainId} = await ethers.provider.getNetwork();
+
+    DeployedContracts[chainId] = DeployedContracts[chainId] || {};
+    DeployedContracts[chainId].controller = controller.address;
+    DeployedContracts[chainId].storage = storage.address;
+    DeployedContracts[chainId].safeController = safeController.address;
+
+    fs.writeFileSync(
+      `${clientPath}/DeployedContracts.json`,
+      JSON.stringify(DeployedContracts), 
+      (err) => {
+      if(err) throw err;
+    });
+
+    console.log(`Contract Addresses saved`);
 
 }
 

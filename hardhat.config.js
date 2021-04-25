@@ -20,10 +20,13 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  defaultNetwork: 'ganache',
+  defaultNetwork: 'hardhat',
   networks: {
     ganache: {
-      url: "http://127.0.0.1:7545"
+      url: "http://127.0.0.1:7545",
+      accounts: {
+        mnemonic: MNEMONIC
+      }
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/07875f5ded264d0c9b5bcce6fb782494",
