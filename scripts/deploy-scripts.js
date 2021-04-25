@@ -5,7 +5,12 @@ require('dotenv').config({path: './.env'});
 const DeployedContracts = require('../client/src/DeployedContracts.json');
 const clientPath = path.resolve(__dirname, '../client/src/');
 
-const {BALANCER_POOL_ADDRESS, SAFE_MANAGER_ADDRESS} = process.env;
+const {
+  BALANCER_POOL_ADDRESS,
+  SAFE_MANAGER_ADDRESS,
+  NEW_ADMIN_1,
+  NEW_ADMIN_2
+} = process.env;
 console.log(`The Balance Pool address is :- ${BALANCER_POOL_ADDRESS}`);
 console.log(`The Safe Manager address is :- ${SAFE_MANAGER_ADDRESS}\n`);
 
@@ -47,6 +52,9 @@ const main = async () => {
 
     await controller.initialiseController(storage.address, safeController.address);
     await safeController.initialiseSafeController(SAFE_MANAGER_ADDRESS, controller.address);
+
+    await controller.addAdmin(NEW_ADMIN_1);
+    await controller.addAdmin(NEW_ADMIN_2);
 
     console.log(`Successfully Updated!\n`);
 

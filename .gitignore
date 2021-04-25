@@ -1,6 +1,7 @@
 
 # IDE Files
 .vscode
+.env
 
 node_modules
 
